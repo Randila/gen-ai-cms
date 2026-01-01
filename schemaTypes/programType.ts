@@ -3,7 +3,7 @@ import {BookIcon} from '@sanity/icons'
 
 export const programType = defineType({
   name: 'program',
-  title: 'Program',
+  title: 'Programs',
   type: 'document',
   groups: [
     {name: 'course_header', title: 'Course Header', default:true},

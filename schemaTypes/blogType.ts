@@ -2,7 +2,7 @@ import { defineField, defineType } from "sanity";
 
 export const blogType = defineType({
     name: 'Blog',
-    title : 'Blog',
+    title : 'Blogs',
     type : 'document',
     groups :[
         {name : 'blog_card' , title : 'Blog Card', default:true},
