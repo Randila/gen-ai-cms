@@ -1,5 +1,6 @@
 import {defineField, defineType} from 'sanity'
 import {BookIcon} from '@sanity/icons'
+import { DiscountedPriceInput } from '../componenets/discountedPriceInput'
 
 export const programType = defineType({
   name: 'program',
@@ -18,7 +19,6 @@ export const programType = defineType({
       validation: (rule) => rule.required(),
       group: 'course_header',
     }),
-
     defineField({
       name: 'slug',
       type: 'slug',
@@ -27,28 +27,57 @@ export const programType = defineType({
       group: 'course_header',
     }),
     defineField({
+      name: 'Course_Thumbnail',
+      description: 'Set an image for the course thumbnail.',
+      type: 'image',
+      group: 'course_header',
+      validation:(rule)=>rule.required()
+    }),  
+    defineField({
+      name: 'Subheading',
+      type: 'string',
+      validation: (rule) => rule.required(),
+      group: 'course_header',
+    }),  
+    defineField({
+      name: 'Text_Color',
+      description:"Enter a text color for the course card",
+      type: 'color',
+      options:{
+        disableAlpha:false
+      },
+      validation: (rule) => rule.required().error("Enter the color of text you want inside the course card"),
+      group: 'course_header',
+    }),
+    defineField({
+      name: 'Bg_Color',
+      title: "Background Color",
+      description:"Enter a background color for the course card",
+      type: 'color',
+      options:{
+        disableAlpha:false
+      },
+      validation: (rule) => rule.required().error("Enter the color of the thumbnail image you're using for the card"),
+      group: 'course_header',
+    }),
+    defineField({
       name: 'Background_Image',
       description: 'Set a background image for the course.',
       type: 'image',
-      group: 'course_header',
+      group: 'course_body',
     }),
     defineField({
-      name: 'subheading',
+      name: 'Small_Description',
+      description: 'Small description about the course to be displayed inside the individual course page',
       type: 'string',
-      group: 'course_header',
-    }),
-    defineField({
-      name: 'Rich_Description',
-      type: 'array',
-      description: 'Added temporarly for testing purposes.',
-      of: [{type: 'block'}],
-      group: 'course_header',
+      group: 'course_body',
     }),
     defineField({
       name: 'Lesson_Content',
       description: 'Add points for the "What you will learn section"',
       type: 'array',
       of: [{type: 'string'}],
+      validation:(rule)=>rule.required(),
       group: 'course_body',
     }),
     defineField({
@@ -122,13 +151,15 @@ export const programType = defineType({
       description: 'Requirements to take the course',
       type: 'array',
       of: [{type: 'string'}],
-      group: 'course_body'
+      group: 'course_body',
+      validation:(rule)=>rule.required(),
     }),
     defineField({
       name: 'Course_Description',
       type: 'array',
       of: [{type: 'block'}],
-      group: 'course_body'
+      group: 'course_body',
+      validation:(rule)=>rule.required(),
     }),
     defineField({
       name: 'Actual_Price',
@@ -140,12 +171,51 @@ export const programType = defineType({
         rule.min(0).required().info('The Price required and it has to be more than 0'),
     }),
     defineField({
-      name: 'Discount',
+      name: 'Enable_Discount',
+      description: 'Enable or disable a discount for the course',
+      type: 'boolean',
+      // options:{
+      //   list:[
+      //     {title:'Enable' , value :"true"},
+      //     {title:'Disable' , value:"false"}
+      //   ],
+      //   layout:'radio'
+      // },
+      initialValue:false,
+      group: 'pricing_card',
+    }),
+    defineField({
+      name: 'Discounted_Price',
       description: 'Discount percentage (Enter as a number)',
       type: 'number',
       group: 'pricing_card',
-      initialValue:0,
-      validation: (rule) => rule.min(0).max(100).error('Discount value has to be between 0 - 100'),
+      initialValue:({document}) => document?.Actual_Price,
+      readOnly:({document})=> !document?.Enable_Discount,
+      components:{
+        input : DiscountedPriceInput
+      },
+      validation: (rule) => rule.custom((value,context)=>{
+        const doc = context.document;
+
+        if(!doc?.Enable_Discount){
+          return true;
+        }
+
+        if(value === undefined || value === null){
+          return 'Discounted price is required when discount is enabled'
+        }
+
+        const actualPrice = (doc?.Actual_Price as number) || 0;
+        if(value >= actualPrice){
+          return `Discounted price must be less than actual price : $${actualPrice}`;
+        }
+
+        if(value<=0){
+          return 'Discounted price must be greater than 0'
+        }
+
+        return true;
+      }),
     }),
     // defineField({
     //   name: 'Final_Price',
