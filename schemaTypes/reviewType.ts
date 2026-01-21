@@ -61,5 +61,20 @@ export const reviewType = defineType({
       initialValue: 5,
       hidden: ({document}) => document?.Review_Type === 'video',
     }),
+    defineField({
+      name: 'Reviewer_Role',
+      description: 'Select the role of the reviewer.',
+      type: 'string',
+      options:{
+        list:[
+            {title : "Student" , value : "student"},
+            {title : "Parent" , value: "parent"}
+        ],
+        layout:'radio',
+      },
+      initialValue: "parent",
+      validation: (rule) => rule.required(),
+      hidden: ({document}) => document?.Review_Type === 'video',
+    }),
   ],
 })
