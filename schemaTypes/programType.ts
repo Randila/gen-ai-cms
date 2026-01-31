@@ -213,7 +213,6 @@ export const programType = defineType({
       type: 'reference',
       to : [{type : 'program'}],
       group: 'course_body',
-      validation: (rule) => rule.required(),
     }),
     
 
